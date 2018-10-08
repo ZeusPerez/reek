@@ -60,6 +60,7 @@ module Reek
             false
           end
         else
+          # TODO: Check if we excluded the file explicitly
           false
         end
       end

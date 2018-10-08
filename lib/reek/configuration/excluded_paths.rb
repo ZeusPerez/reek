@@ -10,10 +10,12 @@ module Reek
     module ExcludedPaths
       include ConfigurationValidator
 
-      # @quality :reek:NestedIterators { max_allowed_nesting: 2 }
+      # @param paths [String]
+      # @return [undefined]
       def add(paths)
-        paths.each do |path|
-          with_valid_directory(path) { |directory| self << directory }
+        paths.map {|path| Pathname(path) }.each do |path|
+          raise "Path #{path} does not exist" unless path.exist?
+          self << path
         end
       end
     end

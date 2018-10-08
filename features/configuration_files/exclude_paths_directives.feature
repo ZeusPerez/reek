@@ -22,6 +22,40 @@ Feature: Exclude paths directives
     When I run reek -c config.reek .
     Then it succeeds
     And it reports nothing
+
+  Scenario: Exclude single file
+    Given a file named "bad_files_live_here/smelly1.rb" with:
+      """
+      # Smelly class 1
+      class Smelly
+        # This will reek of UncommunicativeMethodName
+        def x
+        end
+      end
+      """
+    And a file named "bad_files_live_here/smelly2.rb" with:
+      """
+      # Smelly class 2
+      class Smelly
+        def foobar
+          y = 10 # This will reek of UncommunicativeVariableName
+        end
+      end
+      """
+    And a file named "config.reek" with:
+      """
+      ---
+      exclude_paths:
+        - bad_files_live_here/smelly1.rb
+      """
+    When I run reek -c config.reek .
+    Then the exit status indicates smells
+    And it reports:
+      """
+      bad_files_live_here/smelly1.rb -- 1 warning:
+        [4]:UncommunicativeMethodName: Smelly#x has the name 'x'
+      """
+
   Scenario: Using a file name within an excluded directory
     Given a file named "bad_files_live_here/smelly.rb" with:
       """
